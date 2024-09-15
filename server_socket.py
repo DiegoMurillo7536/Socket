@@ -12,32 +12,34 @@ server_socket.bind(server_address)
 server_socket.listen(5)
 print(f"Servidor escuchando en {server_address}")
 
-def adivinar_numero(minimo, maximo, numero_adivinar):
-    coontador_desaciertos = 0
+def guess_number(minimun, maximun, number_to_guess):
+    successes_counter = 0
     
-    while coontador_desaciertos < 3:
-        numero_aleatorio = random.randint(minimo, maximo)
+    while successes_counter < 3:
+        random_number = random.randint(minimun, maximun)
         
-        if numero_aleatorio == numero_adivinar:
-            print(f"El número {numero_aleatorio} es el correcto")
+        if random_number == number_to_guess:
+            print(f"El número {random_number} es el correcto")
             return True
-        elif numero_aleatorio < numero_adivinar:
-            print(f"El número {numero_aleatorio} es menor que el número que se quiere adivinar")
-            minimo = numero_aleatorio +1
-        elif numero_aleatorio > numero_adivinar:
-            print(f"El número {numero_aleatorio} es mayor que el número que se quiere adivinar")
-            maximo = numero_aleatorio -1
+        elif random_number < number_to_guess:
+            print(f"El número {random_number} es menor que el número que se quiere adivinar")
+            minimun = random_number +1
+        elif random_number > number_to_guess:
+            print(f"El número {random_number} es mayor que el número que se quiere adivinar")
+            maximun = random_number -1
         
-        coontador_desaciertos += 1
-        print(f"Llevas {coontador_desaciertos} desacierto(s)")
+        successes_counter += 1
+        print(f"Llevas {successes_counter} desacierto(s)")
     
-    print(f"Perdiste, el número a adivinar era {numero_adivinar}")
+    print(f"Perdiste, el número a adivinar era {number_to_guess}")
     return False
 
-cantidad_turnos_exitosos = 0
-cantidad_turnos_fallidos = 0
+shifts_successes_quantity = 0
+shifts_failures_quantity = 0
 
-while True:
+connection_status = True
+
+while connection_status:
     # Esperar a que un cliente se conecte
     print("Esperando conexión de un cliente...")
     connection, client_address = server_socket.accept()
@@ -51,7 +53,10 @@ while True:
             received_message = data.decode()
             print(f"Recibido: {received_message}")
 
-           
+            if received_message == "0,0,0":
+                    connection_status = False
+                    connection.close()
+                    break
             # Separar los números usando el delimitador
             numbers_str = received_message.split(",")
             
@@ -61,18 +66,13 @@ while True:
                 number_to_guess = int(numbers_str[2])
                 print(f"Números recibidos: Min={minimun_number}, Max={maximun_number}, Adivinar={number_to_guess}") 
             
-                if adivinar_numero(minimun_number, maximun_number, number_to_guess):
-                    cantidad_turnos_exitosos += 1
+                if guess_number(minimun_number, maximun_number, number_to_guess):
+                    shifts_successes_quantity += 1
                 else:
-                    cantidad_turnos_fallidos += 1
-                
-                if numbers_str[3] == "terminar":
-                    connection.close()
-                    break
-
+                    shifts_failures_quantity += 1
                 # Imprimir los contadores
-                print(f"La cantidad de turnos exitosos es {cantidad_turnos_exitosos}")
-                print(f"La cantidad de turnos fallidos es {cantidad_turnos_fallidos}")
+                print(f"La cantidad de turnos exitosos es {shifts_successes_quantity}")
+                print(f"La cantidad de turnos fallidos es {shifts_failures_quantity}")
                
             else:
                 print("No se recibieron suficientes números.")
