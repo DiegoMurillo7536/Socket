@@ -1,5 +1,6 @@
 import socket
 from utils import Utils
+
 # Crear un socket de servidor TCP/IP
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -38,17 +39,19 @@ while True:
             minimun_number = int(numbers_str[0])
             maximun_number = int(numbers_str[1])
             number_to_guess = int(numbers_str[2])
-            print(f"Números recibidos: Mínimo={minimun_number}, Máximo={maximun_number}, Adivinar={number_to_guess}") 
+            print(
+                f"Números recibidos: Mínimo={minimun_number}, Máximo={maximun_number}, Adivinar={number_to_guess}"
+            )
 
             if Utils.guess_number(minimun_number, maximun_number, number_to_guess):
                 shifts_successes_quantity += 1
             else:
                 shifts_failures_quantity += 1
-            
+
             # Imprimir los contadores en el servidor
             print(f"La cantidad de turnos exitosos es {shifts_successes_quantity}")
             print(f"La cantidad de turnos fallidos es {shifts_failures_quantity}")
 
             # Responder al cliente
-            message_to_send_to_client =f"Mensaje recibido. Intentos con exito: {shifts_successes_quantity}, intentos fallidos:{shifts_failures_quantity}"
+            message_to_send_to_client = f"Mensaje recibido. Intentos con exito: {shifts_successes_quantity},intentos fallidos:{shifts_failures_quantity}"
             connection.sendall(message_to_send_to_client.encode())
